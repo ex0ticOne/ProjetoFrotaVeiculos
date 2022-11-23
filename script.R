@@ -1,0 +1,54 @@
+options(scipen = 999, warn = -1)
+
+library(prophet)
+library(dygraphs)
+library(dplyr)
+library(htmltools)
+library(readr)
+library(tidyr)
+
+source('ProphetPersonalizado.R')
+
+dataset_frota <- read_csv('dataset_frota.csv')
+
+lista_UF <- data.frame(table(dataset_frota$UF))
+lista_UF <- as.factor(lista_UF$Var1)
+
+lista_tipo <- data.frame(table(dataset_frota$TIPO))
+lista_tipo <- as.factor(lista_tipo$Var1)
+
+dataset_frota_UF <- dataset_frota %>%
+  group_by(UF, TIPO, ds) %>%
+  summarise(y = sum(y)) %>%
+  mutate(diferenca = y - lag(y))
+
+media_aumento_frota_UF <- dataset_frota_UF %>%
+  group_by(UF, TIPO) %>%
+  summarise(media = round(mean(diferenca, na.rm = TRUE), digits = 0))
+
+for (item_UF in lista_UF) {
+  
+  for(item_tipo in lista_tipo) {
+    
+    modelo <- prophet(dataset_frota_UF %>%
+                        filter(UF == item_UF & 
+                               TIPO == item_tipo) %>%
+                        select(ds, y), 
+                      yearly.seasonality = TRUE, 
+                      weekly.seasonality = FALSE, 
+                      daily.seasonality = FALSE)
+    
+    periodos_futuros <- make_future_dataframe(modelo, 48, freq = "month", include_history = TRUE)
+    
+    projecao <- predict(modelo, periodos_futuros)
+    
+    plot_projecao <- dyplot.prophet(modelo, projecao, uncertainty = TRUE, 
+                                    main = paste0("Projeção - ", item_UF, " - ", item_tipo)) %>% 
+      dyOptions(maxNumberWidth = 20)
+    
+    save_html(html = plot_projecao, 
+              file = paste0("resultados/Projeção - ", item_UF, " - ", item_tipo, ".html"))
+    
+  }
+
+}
