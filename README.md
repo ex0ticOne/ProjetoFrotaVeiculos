@@ -3,7 +3,7 @@
 ### Ferramentas e dados utilizados
 
 -   Pacote Prophet
--   Dataset compilado com dados de frotas de veículos de Março de 2020 até Setembro de 2022, por UF, município e categoria de veículo, obtido por meio do Portal de Dados Abertos do gov.br (disponível em https://drive.google.com/file/d/1g5qB0yfOiFMAdsQ2RdxKYirRpkdE0zse/view?usp=sharing).
+-   Dataset compilado com dados de frotas de veículos de Março de 2020 até Setembro de 2022, por UF, município e categoria de veículo, obtido por meio do Portal de Dados Abertos do gov.br (disponível no Kaggle em https://www.kaggle.com/datasets/ex0ticone/number-of-cars-registered-in-brazil).
 -   Tidyverse para manipulação dos dados
 
 Ao rodar o script, o algoritmo gerará uma série de projeções por categoria de veículo, para o número de meses futuros estipulado
